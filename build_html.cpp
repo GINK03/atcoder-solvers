@@ -5,12 +5,13 @@
 #include<map>
 #include<functional>
 #include<vector>
+#include<tuple>
 namespace BuildsUtil{
   static std::string begin(const std::string& in){
     return "<" + in + ">";
   };
   static std::string end(const std::string& in){
-    return "</" + in + ">";
+    return "</" + in + ">\n";
   };
   std::string wrapp(const std::string& in, const std::string& ac){
     return begin(ac) + in + end(ac);
@@ -30,18 +31,23 @@ class BuildHTML{
   BuildHTML()
   :_data("")
   {
-    //if(COUT != nullptr)     BuildHTML::COUT = std::shared_ptr<BuildHTML>(new BuildHTML());
   };
   ~BuildHTML(){};
-  template<class SFIX>
-  BuildHTML operator <<(SFIX in){
-    _data.insert(_cur, BuildsUtil::begin("br").c_str());
-    _cur  = BuildsUtil::begin("br").length();
+  template<class FUNC>
+  BuildHTML operator <<(FUNC func){
+    std::vector<std::string> v = func();
+    _data.insert(_cur, BuildsUtil::wrapp(v[1], v[0]).c_str());
+    _cur  += BuildsUtil::wrapp(v[1], v[0]).length();
     return *this;
   };
   BuildHTML operator <<(HEAD head){
     _data += BuildsUtil::wrapp(head.in, "head");
     _cur  += _data.length();
+    return *this;
+  };
+  BuildHTML operator <<(BR br){
+    _data.insert(_cur, BuildsUtil::end("br").c_str());
+    _cur  += BuildsUtil::end("br").length();
     return *this;
   };
   BuildHTML operator <<(BODY body){
@@ -50,36 +56,23 @@ class BuildHTML{
     _data += BuildsUtil::end("body");
     return *this;
   };
-  BuildHTML operator <<(END end){
-    std::cout << _data << std::endl; 
-    return *this;
-  };
   BuildHTML operator <<(const char* in){
     _data.insert(_cur, BuildsUtil::wrapp(in, "a").c_str());
     _cur  += BuildsUtil::wrapp(in, "a").length();
     return *this;
   };
+  void operator <<(END end){
+    // output only
+    std::cout << _data << std::endl; 
+  };
 };
-
-int ordrcnt = 0;
-std::vector<std::function<void()>> v;
-
-template<class FUNC>
-int sub(FUNC f){
-  auto func = std::bind(f);
-  v.push_back(func);
-  return 0;
-};
-#include <algorithm>
 int main(){
   auto COUT = *std::shared_ptr<BuildHTML>(new BuildHTML()); 
   COUT << BuildHTML::HEAD("kusonemi")
        << BuildHTML::BODY()
           << "hage"   << "mage"   << BuildHTML::BR()
           << "mogzya" << "touch"  << BuildHTML::BR()
+          << [&](){std::vector<std::string> v = {"h1","眠くて無理だ"}; return v;}
        << BuildHTML::END();
-  sub([&](){std::cout << "nemui" << std::endl; return 1;});
-  sub([&](){std::cout << "眠くて無理だ" << std::endl; return 2;});
-  sub([&](){std::cout << "多分これはいける" << std::endl; return 3;});
-  std::for_each(std::begin(v), std::end(v), [](std::function<void()> f){f();});
+  return 0;
 };
