@@ -23,53 +23,103 @@ class BuildHTML{
   constexpr static auto head = "head";
   std::string _data;
   int64_t     _cur;
+  //do not allow create free instance
+  BuildHTML()
+  :_data("")
+  {};
+  ~BuildHTML(){};
   public:
   struct BR{};
   struct BODY{};
   struct END{};
-  struct HEAD{std::string in;HEAD(const std::string& in):in(in){};};
-  BuildHTML()
-  :_data("")
-  {
+  struct HEADIN{
+    std::string in;
+    HEADIN(const std::string& in)
+    :in(in){};
   };
-  ~BuildHTML(){};
+  struct HEAD{
+    HEADIN hin; std::string in;
+    HEAD(const HEADIN& hin, const std::string& in)
+    :hin(hin), in(in){};
+  };
+  struct DOCTYPE{
+    std::string in;
+    DOCTYPE(const std::string& in):in(in){};
+    DOCTYPE():in("<!DOCTYPE html>\n"){};
+  };
+  struct LANG{
+    std::string in;
+    LANG(const std::string& in):in("<html lang=\""+in+"\">\n"){};
+    LANG():in("<html lang=\"ja\">\n"){};
+  };
+  static BuildHTML& COUT(){
+    static auto cout = BuildHTML(); 
+    return cout;
+  };
   template<class FUNC>
-  BuildHTML operator <<(FUNC func){
+  BuildHTML& operator <<(FUNC func){
     std::vector<std::string> v = func();
     _data.insert(_cur, BuildsUtil::wrapp(v[1], v[0]).c_str());
     _cur  += BuildsUtil::wrapp(v[1], v[0]).length();
     return *this;
   };
-  BuildHTML operator <<(HEAD head){
-    _data += BuildsUtil::wrapp(head.in, "head");
-    _cur  += _data.length();
+  BuildHTML& operator <<(const DOCTYPE& doctype){
+    _data.insert(_cur, doctype.in);
+    _cur   += doctype.in.length();
     return *this;
   };
-  BuildHTML operator <<(BR br){
-    _data.insert(_cur, BuildsUtil::end("br").c_str());
+  BuildHTML& operator <<(const LANG& lang){
+    _data.insert(_cur, lang.in);
+    _cur   += lang.in.length();
+    return *this;
+  };
+  BuildHTML& operator <<(const HEAD& head){
+    _data += BuildsUtil::wrapp(
+        BuildsUtil::wrapp(head.hin.in, "title"),
+        "head");
+    _cur  += BuildsUtil::wrapp(
+        BuildsUtil::wrapp(head.hin.in, "title"),
+        "head").length();
+    return *this;
+  };
+  BuildHTML& operator <<(const BR& br){
+    _data.insert(_cur, BuildsUtil::end("br"));
     _cur  += BuildsUtil::end("br").length();
     return *this;
   };
-  BuildHTML operator <<(BODY body){
+  BuildHTML& operator <<(const BODY& body){
     _data += BuildsUtil::begin("body");
     _cur  += BuildsUtil::begin("body").length();
     _data += BuildsUtil::end("body");
     return *this;
   };
-  BuildHTML operator <<(const char* in){
-    _data.insert(_cur, BuildsUtil::wrapp(in, "a").c_str());
+  BuildHTML& operator <<(const char* in){
+    _data.insert(_cur, BuildsUtil::wrapp(in, "a"));
     _cur  += BuildsUtil::wrapp(in, "a").length();
     return *this;
   };
-  void operator <<(END end){
+  struct P{
+    std::string in;
+    P(const std::string& in):in(in){};
+  };
+  BuildHTML& operator <<(const P& p){
+    _data.insert(_cur, BuildsUtil::wrapp(p.in, "p"));
+    _cur  += BuildsUtil::wrapp(p.in, "p").length();
+    return *this;
+  };
+  void operator <<(const END& end){
     // output only
     std::cout << _data << std::endl; 
   };
 };
 int main(){
-  auto COUT = *std::shared_ptr<BuildHTML>(new BuildHTML()); 
-  COUT << BuildHTML::HEAD("kusonemi")
+  //auto COUT = *std::shared_ptr<BuildHTML>(new BuildHTML()); 
+  BuildHTML::COUT()
+       << BuildHTML::DOCTYPE()
+       << BuildHTML::LANG("ja")
+       << BuildHTML::HEAD(BuildHTML::HEADIN("眠たいページ"), "kusonemi")
        << BuildHTML::BODY()
+          << BuildHTML::P("mogeo")
           << "hage"   << "mage"   << BuildHTML::BR()
           << "mogzya" << "touch"  << BuildHTML::BR()
           << [&](){std::vector<std::string> v = {"h1","眠くて無理だ"}; return v;}
