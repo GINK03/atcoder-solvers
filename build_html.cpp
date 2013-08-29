@@ -6,14 +6,30 @@
 #include<functional>
 #include<vector>
 #include<tuple>
+//#include<boost/mpl/string.hpp>
 namespace BuildsUtil{
+  //boost::mpl::string<'age'> age;
+  std::string __str = "";
+  template<class...> 
+  static std::string begin();
+  template<char x, char... xs> 
+  std::string begin(){
+    __str += x;
+    return begin<xs...>();
+  };
+  template<>
+  std::string begin<>(){
+    std::string res = __str;
+    __str == "";
+    return res;
+  };
   static std::string begin(const std::string& in){
-    return "<" + in + ">";
+    return std::string("<").append(in).append(">");
   };
   static std::string end(const std::string& in){
     return "</" + in + ">\n";
   };
-  std::string wrapp(const std::string& in, const std::string& ac){
+  static std::string wrapp(const std::string& in, const std::string& ac){
     return begin(ac) + in + end(ac);
   };
 };
@@ -88,14 +104,14 @@ class BuildHTML{
     return *this;
   };
   BuildHTML& operator <<(const BODY& body){
-    _data += BuildsUtil::begin("body");
+    _data += BuildsUtil::begin<'<','b','o','d','y','>'>();
     _cur  += BuildsUtil::begin("body").length();
     _data += BuildsUtil::end("body");
     return *this;
   };
   BuildHTML& operator <<(const char* in){
-    _data.insert(_cur, BuildsUtil::wrapp(in, "a"));
-    _cur  += BuildsUtil::wrapp(in, "a").length();
+    _data.insert(_cur, BuildsUtil::wrapp(in, "p"));
+    _cur  += BuildsUtil::wrapp(in, "p").length();
     return *this;
   };
   struct P{
