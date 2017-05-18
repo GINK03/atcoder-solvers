@@ -51,4 +51,18 @@ fun miss2() {
 
 
 fun main(args : Array<String>) {
+  readLine()
+  val bs = readLine()!!.split(" ").map { x -> x.toInt() }
+  var l  = 0
+  var r  = 0
+  var cnt = 0L
+  while(l < bs.size ) { 
+    while(r + 1 < bs.size && bs[r] < bs[r+1]) {
+      r++
+    }
+    cnt += r - l + 1
+    l++
+    if( l > r ) r++
+  }
+  println(cnt)
 }
