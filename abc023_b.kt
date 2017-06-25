@@ -17,6 +17,7 @@ fun main( args : Array<String> ) {
     }
   }
   when { 
+    txt.size%2 == 0           -> println( -1 )
     txt[cen-1] != "b"         -> println( -1 )
     st.all { x -> x == true } -> println( st.size )
     else                      -> println( -1 )
