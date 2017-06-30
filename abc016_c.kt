@@ -1,4 +1,3 @@
-
 fun main( args : Array<String> ) {
   val (m, n) = readLine()!!.split(" ").map { it.toInt() }
   val mm     = mutableMapOf<Int, MutableList<Int>>()
