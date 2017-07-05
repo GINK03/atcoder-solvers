@@ -1,18 +1,17 @@
 import java.math.BigDecimal
 
 fun main( args : Array<String> ) {
-  val bbb   = BigDecimal(1000000007L)
+  val bbb   = 1000000007L
   val (a,b) = readLine()!!.split(" ").map { it.toInt() }
-  val A     = listOf(BigDecimal(1), (1L..a).map { BigDecimal(it) }. reduce {y,x -> 
-                    y.rem(bbb).times(x.rem(bbb)).rem(bbb)
+  val A     = listOf(1L, (1L..a).map { it.toLong() }. reduce {y,x -> 
+                    (y%bbb*x%bbb)%bbb
                   } ).max()!!
-  val B     = listOf(BigDecimal(1), (1L..b).map { BigDecimal(it) }.reduce {y,x -> 
-                    y.rem(bbb).times(x.rem(bbb)).rem(bbb)
+  val B     = listOf(1L, (1L..b).map { it.toLong() }.reduce {y,x -> 
+                    (y%bbb*x%bbb)%bbb
                   } ).max()!!
-  println(A) 
   when {
-    a == b -> A.times(B).rem(bbb)
-    a+1 == b || a == b+1 -> A.times(B).rem(bbb)
+    a == b -> (A%bbb*B%bbb)%bbb*2%bbb
+    a+1 == b || a == b+1 -> (A%bbb*B%bbb)%bbb
     else -> 0
   }.let { println(it) }
 }
