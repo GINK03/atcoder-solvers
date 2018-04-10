@@ -1,47 +1,44 @@
-import java.lang.*
 
-fun main(args:Array<String>) {
-  val bm = (0.."11111".toInt(2)).map {
-    "${java.lang.Integer.toBinaryString(it)}".padStart(5, '0')
-  }.filter {
-    it.toList().filter { it == '1' }.size == 3
-  }
-  //println(bm)
+fun main(args:Array<String>){
+  val march = "MARCH".toList().map(Char::toString).toSet()
 
   val n = readLine()!!.toInt()
-  val m = mutableMapOf<String, Int>()
-  val march = "MARCH".toList().map { it.toString() }
-  for( it in (1..n) ) { 
-    val name = readLine()!!
-    val h = name[0].toString()
-    if( !march.contains(h) )
+  val bs = (1..n).map { readLine()!!.toList().first().toString() }
+
+  val char_freq = mutableMapOf<String, Int>()
+
+  for( char in bs ) {
+    if( march.contains(char) == false )
       continue
-    if( m.get(h) == null )
-      m[h] = 0
-    m[h] = m[h]!! + 1
+    if( char_freq.get(char) == null )
+      char_freq[char] = 0
+    char_freq[char] = char_freq[char]!! + 1
   }
 
-  val marchFreq = "MARCH".toList().map { char ->
-    val h = char.toString()
-    when {
-      m.get(h) != null -> Pair(h,m[h]!!) 
-      else -> Pair(h,0)
-    }
-  }
+  //println(char_freq)
+  val size = char_freq.size
+  
+  // 3つ選んだアルファベットのsetを作る
 
-  var result = 0
-  for( mask in bm ) {
-    val comb = mask.toList().zip( marchFreq ).map {
-      val (bit, pair) = it
-      val freq = pair.second
-      //println("${bit.toString().toInt()} ${freq}")
-      bit.toString().toInt()*freq 
-    }.filter { it != 0 }
-    if( comb.size == 3 ) {
-      val min_result = comb.reduce { y,x -> y*x }
-      result += min_result
-      //println("${mask} ${marchFreq} ${comb} ${min_result}" )
+  val bag = mutableSetOf<MutableSet<String>>()
+
+  val keys = char_freq.toList().map { it.first }
+
+  for( key1 in keys ) {
+    for ( key2 in keys ) {
+      for( key3 in keys ) {
+        val minibag = mutableSetOf<String>()
+        minibag.add(key1)
+        minibag.add(key2)
+        minibag.add(key3)
+        if( minibag.size != 3) continue
+        bag.add(minibag)
+      }
     }
   }
-  println(result)
+  bag.map {  minibag ->
+    minibag.map { key ->
+      char_freq[key]!!
+    }.reduce { y,x -> y*x }
+  }.sum().let(::println)
 }
