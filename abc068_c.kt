@@ -9,7 +9,7 @@ fun main(args:Array<String>) {
     val m = mutableMapOf<Int,MutableList<Int>>()
     it.map { 
       val (key,value) = it
-      //println(it)
+      //lprintln(it)
       if( m[key] == null ) m[key] = mutableListOf()
       m[key]!!.add( value )
     }
