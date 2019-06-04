@@ -1,0 +1,5 @@
+s=input()
+orig = len(s)
+ones = sum([1 for x in s if x == '1'])
+zeros = sum([1 for x in s if x == '0'])
+print(2*min(ones, zeros))
