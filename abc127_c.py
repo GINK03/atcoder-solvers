@@ -1,12 +1,21 @@
-
+import collections
 N,M=map(int,input().split())
 
-agg = None
+L=collections.defaultdict(int)
+R=collections.defaultdict(int)
 for m in range(M):
-    L,R=map(int,input().split())
-    if agg is None:
-        agg = set([r for r in range(L,R+1)])
-    agg &= set([r for r in range(L,R+1)])
+    l,r=map(int,input().split())
+    l-=1; r-=1
+    L[l] += 1
+    R[r+1] +=1
 
+dp=[0]*N
+st=0
 
-print(len(agg))
+for i in range(N):
+    st += L[i]
+    st -= R[i]
+    dp[i] = st
+
+print(dp.count(M))
+
