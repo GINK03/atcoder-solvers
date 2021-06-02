@@ -1,54 +1,34 @@
-import collections
-import copy
+
 H,W=map(int,input().split())
-G=[]
-for h in range(H):
-    G.append(list(input()))
+A=[list(input()) for _ in range(H)]
 
-G[0][0]='.'
+dp = [[0]*(W+2) for _ in range(H+2)]
 
-que = collections.deque([ [0,0,'T', G] ] )
-min_ans = []
-points = {'T':0, 'A':0}
 
-while que:
-    x, y, user, G = que.popleft() 
-    is_flag = False
-    tmp = []
-    for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-        new_x = x+dx
-        new_y = y+dy
 
-        if new_x < 0 or new_x >= H or new_y < 0 or new_y >= W:
-            continue
-        if G[new_x][new_y] == '+':
-            tmp.append((1, new_x, new_y))
-        elif G[new_x][new_y] == '-':
-            tmp.append((-1, new_x, new_y))
-        else:
-            continue
-
-    tmp.sort()
-    if tmp == []:
-        continue
-    
-    p, new_x, new_y = tmp[-1] 
-    points[user] += p
-    if user == 'T':
-        new_user = 'A'
+def check(h,w):
+    if h >= H or w >= W:
+        return -10**18
+    if A[h][w] == "+":
+        return 1
     else:
-        new_user = 'T'
-    #nG=copy.deepcopy(G)
-    G[new_x][new_y] = '.'
-    que.append([new_x, new_y, new_user, G])
+        return -1
 
+# 後ろから(結果から)見ていくdp
+for h in range(H-1, -1, -1):
+    for w in range(W-1,-1, -1):
+        if h == H-1 and w == W-1:
+            continue
+        if (h+w)%2 == 0:
+            # 高橋さんの操作で昔から今(点数が大きい方から来ているはずである)
+            dp[h][w] = max( dp[h+1][w] + check(h+1,w), dp[h][w+1] + check(h,w+1) )
+        else:
+            # 青木さんの操作で昔から今(点数が小さい方から来ているはずである)
+            dp[h][w] = min( dp[h+1][w] - check(h+1,w), dp[h][w+1] - check(h,w+1) )
 
-
-if points['T'] > points['A']:
+if dp[0][0] > 0:
     print("Takahashi")
-elif points['T'] < points['A']:
-    print("Aoki")
-else:
+elif dp[0][0] == 0:
     print("Draw")
-
-#print(points)
+else:
+    print("Aoki")
