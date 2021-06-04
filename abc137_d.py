@@ -1,19 +1,17 @@
-N,M=map(int,input().split())
+import heapq
+import collections
+N, M = map(int, input().split())
 
-xs = []
+dg = collections.defaultdict(list)
 for n in range(N):
-    a,b = map(int,input().split())
-    xs.append((a,b))
+    day, gain = map(int, input().split())
+    dg[day].append(gain)
 
-def obj(x):
-    return (x[1])*-1
-xs = sorted(xs,key=lambda x:obj(x))
-print(xs)
-
-day_exs = {}
-for day, pay in xs:
-    if day_exs.get(day) is None:
-        day_exs[day] = []
-    day_exs[day].append(pay)
-print(day_exs)
-
+que = []
+ans = 0
+for m in range(1, M + 1):  # 最後の日から見ていく
+    for gain in dg[m]:
+        heapq.heappush(que, -gain)
+    if que:
+        ans += -heapq.heappop(que)
+print(ans)
