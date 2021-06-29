@@ -1,3 +1,5 @@
 *.jar
 *.bin
 *.exe
+a.out
+a
