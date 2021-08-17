@@ -22,10 +22,9 @@ def main():
         r, l = heapq.heappop(balls)
         if r < target:
             print("No")
-            break
+            return 
         target += 1
-    else:
-        print("Yes")
+    print("Yes")
 
 
 
