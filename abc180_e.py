@@ -18,6 +18,7 @@ def main():
             xj,yj,zj = XYZ[j]
             edge[i][j] = abs(xi-xj) + abs(yi-yj) + max(0, zi-zj)
             edge[j][i]= abs(xi-xj) + abs(yi-yj) + max(0, -zi+zj)
+
     dp = [[inf] * N for _ in range(1<<N)]
     dp[0][0] = 0
 
